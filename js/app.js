@@ -341,6 +341,13 @@ function spawnMultiplier() {
         playPowerupSound();
     });
     
+    powerup.addEventListener('touchstart', (event) => {
+        event.preventDefault();
+        activateMultiplier(multiplierType);
+        powerup.remove();
+        playPowerupSound();
+    });
+    
     multiplierContainer.appendChild(powerup);
     
     // Auto-remove after 10 seconds if not clicked
@@ -513,6 +520,10 @@ function takeBite(event) {
 
 // Event listener
 burger.addEventListener('click', takeBite);
+burger.addEventListener('touchstart', (event) => {
+    event.preventDefault();
+    takeBite(event.touches[0] || event);
+});
 
 // Keyboard shortcut (spacebar)
 document.addEventListener('keydown', (event) => {

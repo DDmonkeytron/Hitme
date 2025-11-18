@@ -160,6 +160,10 @@ main {
     align-items: center;
     filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
     transform-origin: center center;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .burger:hover {
@@ -292,6 +296,10 @@ main {
     animation: float 3s ease-in-out infinite, spawn 0.3s ease-out;
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.4);
     transition: transform 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .multiplier-powerup:hover {
