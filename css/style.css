@@ -138,8 +138,8 @@ main {
 }
 
 .burger-layer {
-    width: 200px;
-    height: 30px;
+    width: 300px;
+    height: 45px;
     margin: -5px 0;
     border-radius: 50%;
     position: relative;
@@ -148,31 +148,31 @@ main {
 
 .bun-top {
     background: linear-gradient(to bottom, var(--bun-color), #c8960f);
-    height: 40px;
+    height: 60px;
     border-radius: 100px 100px 20px 20px;
     box-shadow: inset 0 -3px 5px rgba(0, 0, 0, 0.2);
 }
 
 .sesame {
     position: absolute;
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     background: #f5deb3;
     border-radius: 50%;
     box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.sesame:nth-child(1) { top: 15px; left: 40px; }
-.sesame:nth-child(2) { top: 10px; left: 80px; }
-.sesame:nth-child(3) { top: 12px; left: 120px; }
-.sesame:nth-child(4) { top: 18px; left: 160px; }
-.sesame:nth-child(5) { top: 20px; left: 100px; }
+.sesame:nth-child(1) { top: 20px; left: 60px; }
+.sesame:nth-child(2) { top: 15px; left: 120px; }
+.sesame:nth-child(3) { top: 18px; left: 180px; }
+.sesame:nth-child(4) { top: 25px; left: 240px; }
+.sesame:nth-child(5) { top: 28px; left: 150px; }
 
 .lettuce {
     background: var(--lettuce-color);
     background: linear-gradient(to bottom, #90ee90, #7cb87c);
-    width: 220px;
-    height: 25px;
+    width: 330px;
+    height: 35px;
     border-radius: 50%;
     box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.2);
 }
@@ -180,28 +180,28 @@ main {
 .tomato {
     background: var(--tomato-color);
     background: linear-gradient(to bottom, #ff6347, #cc4f39);
-    height: 20px;
+    height: 28px;
     box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.2);
 }
 
 .cheese {
     background: var(--cheese-color);
     background: linear-gradient(to bottom, #ffd700, #daa520);
-    width: 210px;
-    height: 15px;
+    width: 315px;
+    height: 22px;
     box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.2);
 }
 
 .patty {
     background: var(--patty-color);
     background: linear-gradient(to bottom, #8b4513, #5c2d0f);
-    height: 35px;
+    height: 50px;
     box-shadow: inset 0 -3px 5px rgba(0, 0, 0, 0.3);
 }
 
 .bun-bottom {
     background: linear-gradient(to top, var(--bun-color), #c8960f);
-    height: 35px;
+    height: 50px;
     border-radius: 20px 20px 50px 50px;
     box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.2);
 }
@@ -340,15 +340,15 @@ footer {
     }
 
     .burger-layer {
-        width: 150px;
+        width: 200px;
     }
 
     .lettuce {
-        width: 165px;
+        width: 220px;
     }
 
     .cheese {
-        width: 155px;
+        width: 210px;
     }
 
     .game-stats {

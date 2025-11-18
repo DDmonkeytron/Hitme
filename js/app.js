@@ -9,6 +9,64 @@ let currentMultiplier = 1;
 let activeMultipliers = [];
 let multiplierSpawnInterval;
 
+// Audio elements - using Web Audio API for bite sounds
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+// Create bite sound (crunch)
+function playBiteSound() {
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.1);
+    
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.1);
+}
+
+// Create celebration sound
+function playCelebrationSound() {
+    const notes = [523.25, 659.25, 783.99]; // C, E, G
+    notes.forEach((freq, index) => {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(freq, audioContext.currentTime + index * 0.1);
+        gainNode.gain.setValueAtTime(0.2, audioContext.currentTime + index * 0.1);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + index * 0.1 + 0.3);
+        
+        oscillator.start(audioContext.currentTime + index * 0.1);
+        oscillator.stop(audioContext.currentTime + index * 0.1 + 0.3);
+    });
+}
+
+// Create powerup sound
+function playPowerupSound() {
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.2);
+    
+    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.2);
+}
+
 // DOM elements
 const burger = document.getElementById('burger');
 const totalBitesEl = document.getElementById('totalBites');
@@ -54,6 +112,7 @@ function spawnMultiplier() {
     powerup.addEventListener('click', () => {
         activateMultiplier(multiplierType);
         powerup.remove();
+        playPowerupSound();
     });
     
     multiplierContainer.appendChild(powerup);
@@ -170,6 +229,8 @@ function eatBurger() {
     celebration.textContent = '🎉 BURGER EATEN! 🎉';
     celebration.classList.add('show');
     
+    playCelebrationSound();
+    
     setTimeout(() => {
         celebration.classList.remove('show');
         
@@ -192,6 +253,9 @@ function takeBite(event) {
     setTimeout(() => {
         burger.classList.remove('bite');
     }, 200);
+    
+    // Play bite sound
+    playBiteSound();
     
     // Create floating emoji
     createFloatingBite(event.clientX, event.clientY);
