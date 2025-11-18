@@ -97,6 +97,16 @@ main {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
+.multiplier-stat {
+    background: linear-gradient(135deg, #4a2c2a, #3d2817);
+    border-color: var(--accent-color);
+}
+
+.multiplier-stat .stat-value {
+    color: var(--success-color);
+    font-size: 2.5rem;
+}
+
 /* Burger Container */
 .burger-container {
     position: relative;
@@ -223,6 +233,98 @@ main {
     animation: celebrate 1s ease-out;
 }
 
+/* Multiplier Powerups */
+#multiplierContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.multiplier-powerup {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    pointer-events: auto;
+    animation: float 3s ease-in-out infinite, spawn 0.3s ease-out;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.4);
+    transition: transform 0.2s ease;
+}
+
+.multiplier-powerup:hover {
+    transform: scale(1.2);
+}
+
+.multiplier-powerup.x2 {
+    background: linear-gradient(135deg, #4ade80, #22c55e);
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.multiplier-powerup.x4 {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.multiplier-timer {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--card-bg);
+    border: 2px solid var(--accent-color);
+    border-radius: 12px;
+    padding: 1rem;
+    min-width: 200px;
+    z-index: 200;
+    box-shadow: var(--shadow);
+}
+
+.multiplier-timer h4 {
+    color: var(--accent-color);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.active-multiplier {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+.active-multiplier .mult-label {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.active-multiplier.x2 .mult-label {
+    color: #4ade80;
+}
+
+.active-multiplier.x4 .mult-label {
+    color: #f59e0b;
+}
+
+.active-multiplier .mult-time {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
 /* Footer */
 footer {
     text-align: center;
@@ -298,4 +400,24 @@ footer {
 
 .burger.bite {
     animation: bite 0.2s ease;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(180deg);
+    }
+}
+
+@keyframes spawn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
