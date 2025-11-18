@@ -3,46 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A random webapp with interactive features">
-    <title>Random Webapp</title>
+    <meta name="description" content="Click to eat burgers - A fun clicking game">
+    <title>Burger Clicker 🍔</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Random Webapp</h1>
-            <p class="tagline">Generate Random Content</p>
+            <h1>🍔 Burger Clicker 🍔</h1>
+            <p class="tagline">Click to take bites!</p>
         </header>
 
         <main>
-            <section class="generator-section">
-                <div class="card">
-                    <h2>Random Number Generator</h2>
-                    <div class="controls">
-                        <input type="number" id="minNum" placeholder="Min" value="1">
-                        <input type="number" id="maxNum" placeholder="Max" value="100">
-                        <button id="generateNum" class="btn">Generate Number</button>
+            <div class="game-stats">
+                <div class="stat-card">
+                    <h3>Total Bites</h3>
+                    <p class="stat-value" id="totalBites">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Burgers Eaten</h3>
+                    <p class="stat-value" id="burgersEaten">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Current Burger</h3>
+                    <p class="stat-value" id="currentBites">0 / 10</p>
+                </div>
+            </div>
+
+            <div class="burger-container">
+                <div class="burger" id="burger">
+                    <div class="burger-layer bun-top">
+                        <div class="sesame"></div>
+                        <div class="sesame"></div>
+                        <div class="sesame"></div>
+                        <div class="sesame"></div>
+                        <div class="sesame"></div>
                     </div>
-                    <div class="result" id="numberResult"></div>
+                    <div class="burger-layer lettuce"></div>
+                    <div class="burger-layer tomato"></div>
+                    <div class="burger-layer cheese"></div>
+                    <div class="burger-layer patty"></div>
+                    <div class="burger-layer bun-bottom"></div>
                 </div>
+                <div class="click-message" id="clickMessage">Click me!</div>
+            </div>
 
-                <div class="card">
-                    <h2>Random Color Generator</h2>
-                    <button id="generateColor" class="btn">Generate Color</button>
-                    <div class="result" id="colorResult"></div>
-                    <div class="color-preview" id="colorPreview"></div>
-                </div>
-
-                <div class="card">
-                    <h2>Random Quote Generator</h2>
-                    <button id="generateQuote" class="btn">Generate Quote</button>
-                    <div class="result quote-result" id="quoteResult"></div>
-                </div>
-            </section>
+            <div class="celebration" id="celebration"></div>
         </main>
 
         <footer>
-            <p>&copy; 2025 Random Webapp. Built with HTML, CSS & JavaScript.</p>
+            <p>&copy; 2025 Burger Clicker. Eat responsibly! 🍔</p>
         </footer>
     </div>
 

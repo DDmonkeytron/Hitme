@@ -1,79 +1,113 @@
-// Random Webapp - Main JavaScript File
+// Burger Clicker Game
 
-// Quote database
-const quotes = [
-    "The only way to do great work is to love what you do. - Steve Jobs",
-    "Innovation distinguishes between a leader and a follower. - Steve Jobs",
-    "Life is what happens when you're busy making other plans. - John Lennon",
-    "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt",
-    "It is during our darkest moments that we must focus to see the light. - Aristotle",
-    "The only impossible journey is the one you never begin. - Tony Robbins",
-    "In the middle of difficulty lies opportunity. - Albert Einstein",
-    "Success is not final, failure is not fatal: it is the courage to continue that counts. - Winston Churchill",
-    "Believe you can and you're halfway there. - Theodore Roosevelt",
-    "The best time to plant a tree was 20 years ago. The second best time is now. - Chinese Proverb"
-];
+// Game state
+let totalBites = 0;
+let burgersEaten = 0;
+let currentBurgerBites = 0;
+const BITES_PER_BURGER = 10;
 
-// Random Number Generator
-document.getElementById('generateNum').addEventListener('click', () => {
-    const min = parseInt(document.getElementById('minNum').value) || 1;
-    const max = parseInt(document.getElementById('maxNum').value) || 100;
+// DOM elements
+const burger = document.getElementById('burger');
+const totalBitesEl = document.getElementById('totalBites');
+const burgersEatenEl = document.getElementById('burgersEaten');
+const currentBitesEl = document.getElementById('currentBites');
+const clickMessage = document.getElementById('clickMessage');
+const celebration = document.getElementById('celebration');
+
+// Update display
+function updateStats() {
+    totalBitesEl.textContent = totalBites;
+    burgersEatenEl.textContent = burgersEaten;
+    currentBitesEl.textContent = `${currentBurgerBites} / ${BITES_PER_BURGER}`;
+}
+
+// Create floating bite animation
+function createFloatingBite(x, y) {
+    const floatingBite = document.createElement('div');
+    floatingBite.textContent = '😋';
+    floatingBite.style.position = 'fixed';
+    floatingBite.style.left = x + 'px';
+    floatingBite.style.top = y + 'px';
+    floatingBite.style.fontSize = '2rem';
+    floatingBite.style.pointerEvents = 'none';
+    floatingBite.style.zIndex = '1000';
+    floatingBite.style.animation = 'celebrate 1s ease-out forwards';
+    document.body.appendChild(floatingBite);
     
-    if (min >= max) {
-        document.getElementById('numberResult').textContent = 'Min must be less than Max!';
-        document.getElementById('numberResult').style.color = '#ef4444';
-        return;
+    setTimeout(() => {
+        floatingBite.remove();
+    }, 1000);
+}
+
+// Eat burger (complete burger)
+function eatBurger() {
+    burger.style.opacity = '0';
+    burger.style.transform = 'scale(0) rotate(360deg)';
+    burger.style.transition = 'all 0.5s ease';
+    
+    celebration.textContent = '🎉 BURGER EATEN! 🎉';
+    celebration.classList.add('show');
+    
+    setTimeout(() => {
+        celebration.classList.remove('show');
+        
+        // Reset burger
+        burger.style.opacity = '1';
+        burger.style.transform = 'scale(1) rotate(0deg)';
+        currentBurgerBites = 0;
+        updateStats();
+    }, 1000);
+}
+
+// Take a bite
+function takeBite(event) {
+    totalBites++;
+    currentBurgerBites++;
+    
+    // Add bite animation
+    burger.classList.add('bite');
+    setTimeout(() => {
+        burger.classList.remove('bite');
+    }, 200);
+    
+    // Create floating emoji
+    createFloatingBite(event.clientX, event.clientY);
+    
+    // Update stats
+    updateStats();
+    
+    // Hide click message after first click
+    if (totalBites === 1) {
+        clickMessage.style.display = 'none';
     }
     
-    const randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
-    const resultElement = document.getElementById('numberResult');
-    resultElement.textContent = randomNum;
-    resultElement.style.color = '#10b981';
-});
+    // Check if burger is finished
+    if (currentBurgerBites >= BITES_PER_BURGER) {
+        burgersEaten++;
+        eatBurger();
+    } else {
+        // Scale down burger slightly with each bite
+        const scale = 1 - (currentBurgerBites / BITES_PER_BURGER) * 0.3;
+        burger.style.transform = `scale(${scale})`;
+    }
+}
 
-// Random Color Generator
-document.getElementById('generateColor').addEventListener('click', () => {
-    const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
-    const resultElement = document.getElementById('colorResult');
-    const previewElement = document.getElementById('colorPreview');
-    
-    resultElement.textContent = randomColor.toUpperCase();
-    resultElement.style.color = randomColor;
-    previewElement.style.backgroundColor = randomColor;
-    previewElement.style.display = 'block';
-});
+// Event listener
+burger.addEventListener('click', takeBite);
 
-// Random Quote Generator
-document.getElementById('generateQuote').addEventListener('click', () => {
-    const randomIndex = Math.floor(Math.random() * quotes.length);
-    const randomQuote = quotes[randomIndex];
-    const resultElement = document.getElementById('quoteResult');
-    
-    resultElement.textContent = randomQuote;
-});
-
-// Add keyboard shortcuts
+// Keyboard shortcut (spacebar)
 document.addEventListener('keydown', (event) => {
-    // Ctrl/Cmd + 1 for random number
-    if ((event.ctrlKey || event.metaKey) && event.key === '1') {
+    if (event.code === 'Space') {
         event.preventDefault();
-        document.getElementById('generateNum').click();
-    }
-    
-    // Ctrl/Cmd + 2 for random color
-    if ((event.ctrlKey || event.metaKey) && event.key === '2') {
-        event.preventDefault();
-        document.getElementById('generateColor').click();
-    }
-    
-    // Ctrl/Cmd + 3 for random quote
-    if ((event.ctrlKey || event.metaKey) && event.key === '3') {
-        event.preventDefault();
-        document.getElementById('generateQuote').click();
+        const rect = burger.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        takeBite({ clientX: centerX, clientY: centerY });
     }
 });
 
-// Initialize on page load
+// Initialize
 window.addEventListener('DOMContentLoaded', () => {
-    console.log('Random Webapp initialized successfully!');
+    console.log('🍔 Burger Clicker initialized! Click the burger to eat!');
+    updateStats();
 });
