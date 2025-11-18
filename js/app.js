@@ -8,6 +8,8 @@ const BITES_PER_BURGER = 10;
 let currentMultiplier = 1;
 let activeMultipliers = [];
 let multiplierSpawnInterval;
+let burgerScale = 1;
+let backgroundStage = 0;
 
 // Audio elements - using Web Audio API for bite sounds
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -81,8 +83,86 @@ const multiplierContainer = document.getElementById('multiplierContainer');
 function updateStats() {
     totalBitesEl.textContent = totalBites;
     burgersEatenEl.textContent = burgersEaten;
-    currentBitesEl.textContent = `${currentBurgerBites} / ${BITES_PER_BURGER}`;
+    
+    // Calculate required bites based on burgers eaten
+    const requiredBites = Math.floor(BITES_PER_BURGER * (1 + burgersEaten * 0.5));
+    currentBitesEl.textContent = `${currentBurgerBites} / ${requiredBites}`;
     multiplierValueEl.textContent = `${currentMultiplier}x`;
+}
+
+// Update burger size and background based on progress
+function updateBurgerSize() {
+    // Scale increases with each burger eaten
+    burgerScale = 1 + (burgersEaten * 0.15);
+    burger.style.transform = `scale(${burgerScale})`;
+    
+    // Update background based on milestones
+    const body = document.body;
+    
+    if (burgersEaten >= 100) {
+        backgroundStage = 7;
+        body.style.background = 'radial-gradient(circle, #000033 0%, #000000 100%)';
+        body.style.backgroundSize = 'cover';
+        document.querySelector('.container').style.background = 'rgba(0,0,0,0.3)';
+    } else if (burgersEaten >= 75) {
+        backgroundStage = 6;
+        body.style.background = 'linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%)';
+        document.querySelector('.container').style.background = 'rgba(0,0,0,0.4)';
+    } else if (burgersEaten >= 50) {
+        backgroundStage = 5;
+        body.style.background = 'linear-gradient(to bottom, #87CEEB 0%, #4682B4 50%, #2F4F4F 100%)';
+        document.querySelector('.container').style.background = 'rgba(255,255,255,0.1)';
+    } else if (burgersEaten >= 30) {
+        backgroundStage = 4;
+        body.style.background = 'linear-gradient(to bottom, #654321 0%, #8B4513 50%, #A0522D 100%)';
+        document.querySelector('.container').style.background = 'rgba(139,69,19,0.3)';
+    } else if (burgersEaten >= 15) {
+        backgroundStage = 3;
+        body.style.background = 'linear-gradient(135deg, #8B4513 0%, #D2691E 50%, #CD853F 100%)';
+        document.querySelector('.container').style.background = 'rgba(139,69,19,0.2)';
+    } else if (burgersEaten >= 5) {
+        backgroundStage = 2;
+        body.style.background = 'linear-gradient(135deg, #8B0000 0%, #DC143C 50%, #FF6347 100%)';
+        document.querySelector('.container').style.background = 'rgba(139,0,0,0.2)';
+    } else if (burgersEaten >= 1) {
+        backgroundStage = 1;
+        body.style.background = 'linear-gradient(135deg, #654321 0%, #8B4513 100%)';
+        document.querySelector('.container').style.background = 'rgba(101,67,33,0.3)';
+    }
+    
+    // Show progress message
+    updateBackgroundMessage();
+}
+
+// Display messages about burger growth
+function updateBackgroundMessage() {
+    let message = '';
+    
+    if (burgersEaten >= 100) {
+        message = '🌌 THE BURGER CONSUMES THE UNIVERSE! 🌌';
+    } else if (burgersEaten >= 75) {
+        message = '🏙️ BURGER BIGGER THAN THE CITY! 🏙️';
+    } else if (burgersEaten >= 50) {
+        message = '🏢 BURGER TOWERS OVER SKYSCRAPERS! 🏢';
+    } else if (burgersEaten >= 30) {
+        message = '🏗️ BURGER CRUSHES THE BUILDING! 🏗️';
+    } else if (burgersEaten >= 15) {
+        message = '🏪 BURGER BURSTS OUT OF THE RESTAURANT! 🏪';
+    } else if (burgersEaten >= 5) {
+        message = '🪑 BURGER BREAKS THE TABLE! 🪑';
+    } else if (burgersEaten >= 1) {
+        message = '🍽️ Burger on the table...';
+    }
+    
+    if (message) {
+        const existingMsg = document.querySelector('.background-message');
+        if (existingMsg) existingMsg.remove();
+        
+        const msgElement = document.createElement('div');
+        msgElement.className = 'background-message';
+        msgElement.textContent = message;
+        document.body.appendChild(msgElement);
+    }
 }
 
 // Calculate total multiplier from active multipliers
@@ -223,7 +303,7 @@ function createFloatingBite(x, y) {
 // Eat burger (complete burger)
 function eatBurger() {
     burger.style.opacity = '0';
-    burger.style.transform = 'scale(0) rotate(360deg)';
+    burger.style.transform = `scale(0) rotate(360deg)`;
     burger.style.transition = 'all 0.5s ease';
     
     celebration.textContent = '🎉 BURGER EATEN! 🎉';
@@ -234,9 +314,10 @@ function eatBurger() {
     setTimeout(() => {
         celebration.classList.remove('show');
         
-        // Reset burger
+        // Reset burger with new size
         burger.style.opacity = '1';
-        burger.style.transform = 'scale(1) rotate(0deg)';
+        updateBurgerSize();
+        burger.style.transition = 'all 0.5s ease';
         currentBurgerBites = 0;
         updateStats();
     }, 1000);
@@ -269,13 +350,15 @@ function takeBite(event) {
     }
     
     // Check if burger is finished
-    if (currentBurgerBites >= BITES_PER_BURGER) {
+    if (currentBurgerBites >= Math.floor(BITES_PER_BURGER * (1 + burgersEaten * 0.5))) {
         burgersEaten++;
         eatBurger();
     } else {
         // Scale down burger slightly with each bite
-        const scale = 1 - (currentBurgerBites / BITES_PER_BURGER) * 0.3;
-        burger.style.transform = `scale(${scale})`;
+        const requiredBites = Math.floor(BITES_PER_BURGER * (1 + burgersEaten * 0.5));
+        const biteProgress = currentBurgerBites / requiredBites;
+        const currentScale = burgerScale * (1 - biteProgress * 0.3);
+        burger.style.transform = `scale(${currentScale})`;
     }
 }
 

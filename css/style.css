@@ -30,12 +30,44 @@ body {
     min-height: 100vh;
     line-height: 1.6;
     overflow-x: hidden;
+    transition: background 2s ease;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
+    transition: background 1s ease;
+}
+
+/* Background message */
+.background-message {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: var(--accent-color);
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    z-index: 150;
+    border: 2px solid var(--accent-color);
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.5);
+    animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
 }
 
 /* Header Styles */
@@ -121,12 +153,13 @@ main {
 /* Burger Styles */
 .burger {
     cursor: pointer;
-    transition: transform 0.1s ease;
+    transition: transform 0.3s ease;
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+    transform-origin: center center;
 }
 
 .burger:hover {
