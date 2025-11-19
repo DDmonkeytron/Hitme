@@ -478,8 +478,8 @@ function eatBurger() {
 
 // Take a bite
 function takeBite(event) {
-    const tierData = burgerTiers[burgerTier];
-    const bitesToAdd = currentMultiplier * tierData.value;
+    const tierInfo = burgerTiers[burgerTier];
+    const bitesToAdd = currentMultiplier * tierInfo.value;
     totalBites += bitesToAdd;
     currentBurgerBites += bitesToAdd;
     
@@ -499,13 +499,12 @@ function takeBite(event) {
     updateStats();
     
     // Hide click message after first click
-    if (totalBites === 1) {
+    if (totalBites === bitesToAdd) {
         clickMessage.style.display = 'none';
     }
     
     // Check if burger is finished
-    const tierData = burgerTiers[burgerTier];
-    const requiredBites = Math.floor(BITES_PER_BURGER * tierData.value * (1 + (burgersEaten % 100) * 0.1));
+    const requiredBites = Math.floor(BITES_PER_BURGER * tierInfo.value * (1 + (burgersEaten % 100) * 0.1));
     
     if (currentBurgerBites >= requiredBites) {
         burgersEaten++;
@@ -518,28 +517,32 @@ function takeBite(event) {
     }
 }
 
-// Event listener
-burger.addEventListener('click', takeBite);
-burger.addEventListener('touchend', (event) => {
-    event.preventDefault();
-    const touch = event.changedTouches[0];
-    takeBite({ clientX: touch.clientX, clientY: touch.clientY });
-});
-
 // Keyboard shortcut (spacebar)
 document.addEventListener('keydown', (event) => {
     if (event.code === 'Space') {
         event.preventDefault();
-        const rect = burger.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        takeBite({ clientX: centerX, clientY: centerY });
+        const burger = document.getElementById('burger');
+        if (burger) {
+            const rect = burger.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            takeBite({ clientX: centerX, clientY: centerY });
+        }
     }
 });
 
 // Initialize
 window.addEventListener('DOMContentLoaded', () => {
     console.log('🍔 Burger Clicker initialized! Click the burger to eat!');
+    
+    // Set up event listeners
+    burger.addEventListener('click', takeBite);
+    burger.addEventListener('touchend', (event) => {
+        event.preventDefault();
+        const touch = event.changedTouches[0];
+        takeBite({ clientX: touch.clientX, clientY: touch.clientY });
+    });
+    
     updateStats();
     
     // Start spawning multipliers every 10-20 seconds
