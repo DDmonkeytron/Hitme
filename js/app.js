@@ -341,7 +341,7 @@ function spawnMultiplier() {
         playPowerupSound();
     });
     
-    powerup.addEventListener('touchstart', (event) => {
+    powerup.addEventListener('touchend', (event) => {
         event.preventDefault();
         activateMultiplier(multiplierType);
         powerup.remove();
@@ -520,9 +520,10 @@ function takeBite(event) {
 
 // Event listener
 burger.addEventListener('click', takeBite);
-burger.addEventListener('touchstart', (event) => {
+burger.addEventListener('touchend', (event) => {
     event.preventDefault();
-    takeBite(event.touches[0] || event);
+    const touch = event.changedTouches[0];
+    takeBite({ clientX: touch.clientX, clientY: touch.clientY });
 });
 
 // Keyboard shortcut (spacebar)
