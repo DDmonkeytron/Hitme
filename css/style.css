@@ -538,6 +538,107 @@ footer {
     }
 }
 
+@keyframes shake {
+    0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
+    10% { transform: translateX(-10px) translateY(5px) rotate(-2deg); }
+    20% { transform: translateX(10px) translateY(-5px) rotate(2deg); }
+    30% { transform: translateX(-10px) translateY(10px) rotate(-1deg); }
+    40% { transform: translateX(10px) translateY(-10px) rotate(1deg); }
+    50% { transform: translateX(-5px) translateY(5px) rotate(-2deg); }
+    60% { transform: translateX(5px) translateY(-5px) rotate(2deg); }
+    70% { transform: translateX(-10px) translateY(0px) rotate(-1deg); }
+    80% { transform: translateX(10px) translateY(0px) rotate(1deg); }
+    90% { transform: translateX(-5px) translateY(0px) rotate(0deg); }
+}
+
+@keyframes explode {
+    0% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(var(--vx, 0), var(--vy, 0)) scale(0) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+@keyframes rainbow {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+}
+
+.screen-shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+.particle {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: explode 1s ease-out forwards;
+    z-index: 9999;
+}
+
+.chaos-mode {
+    animation: rainbow 2s linear infinite;
+}
+
+.combo-display {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4rem;
+    font-weight: bold;
+    color: #FFD700;
+    text-shadow: 0 0 20px #FF0000, 0 0 40px #FF00FF;
+    pointer-events: none;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.combo-display.show {
+    opacity: 1;
+    animation: pulse 0.5s ease-in-out;
+}
+
+.speed-boost {
+    position: absolute;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #00ff00, #00ffff);
+    color: #000;
+    border-radius: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    animation: float 3s ease-in-out infinite, spawn 0.5s ease-out;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+    transition: transform 0.2s ease;
+    z-index: 100;
+}
+
+.speed-boost:hover {
+    transform: scale(1.2);
+}
+
+.random-event {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 0, 0, 0.9);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    z-index: 9999;
+    animation: fadeInUp 0.5s ease-out;
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+}
+
 /* Modal Styles */
 .modal {
     position: fixed;

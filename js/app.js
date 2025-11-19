@@ -19,6 +19,12 @@ let burgerTier = 0;
 let playerName = '';
 let gameStarted = false;
 let currentZoom = 1;
+let comboCount = 0;
+let comboTimer = null;
+let chaosMode = false;
+let clickSpeed = 0;
+let lastClickTime = 0;
+let speedBoostActive = false;
 
 // Burger tier names (100 levels of progression)
 const burgerTiers = [
@@ -488,10 +494,54 @@ function eatBurger() {
 
 // Take a bite
 function takeBite(event) {
+    // Calculate click speed for combos
+    const now = Date.now();
+    const timeSinceLastClick = now - lastClickTime;
+    lastClickTime = now;
+    
+    if (timeSinceLastClick < 200) {
+        comboCount++;
+        if (comboCount > 5) {
+            showCombo(comboCount);
+        }
+    } else {
+        comboCount = 0;
+    }
+    
+    // Clear existing combo timer
+    if (comboTimer) clearTimeout(comboTimer);
+    comboTimer = setTimeout(() => {
+        comboCount = 0;
+    }, 500);
+    
     const tierInfo = burgerTiers[burgerTier];
-    const bitesToAdd = currentMultiplier * tierInfo.value;
+    let bitesToAdd = currentMultiplier * tierInfo.value;
+    
+    // Speed boost doubles bite value
+    if (speedBoostActive) {
+        bitesToAdd *= 2;
+    }
+    
+    // Combo multiplier
+    if (comboCount > 5) {
+        bitesToAdd *= (1 + (comboCount * 0.1));
+    }
+    
     totalBites += bitesToAdd;
     currentBurgerBites += bitesToAdd;
+    
+    // Spawn particles at click location
+    if (event && event.clientX) {
+        spawnParticles(event.clientX, event.clientY);
+    }
+    
+    // Screen shake on big combos or high tiers
+    if (comboCount > 10 || burgerTier > 50) {
+        document.body.classList.add('screen-shake');
+        setTimeout(() => {
+            document.body.classList.remove('screen-shake');
+        }, 500);
+    }
     
     // Add bite animation
     burger.classList.add('bite');
@@ -635,6 +685,32 @@ function startGame() {
         spawnMultiplier();
         scheduleNextMultiplier();
     }, 5000);
+    
+    // Random events every 30-60 seconds
+    function scheduleRandomEvent() {
+        const delay = Math.random() * 30000 + 30000; // 30-60 seconds
+        setTimeout(() => {
+            triggerRandomEvent();
+            scheduleRandomEvent();
+        }, delay);
+    }
+    
+    setTimeout(() => {
+        scheduleRandomEvent();
+    }, 15000); // First event after 15 seconds
+    
+    // Speed boosts every 20-40 seconds
+    function scheduleSpeedBoost() {
+        const delay = Math.random() * 20000 + 20000;
+        setTimeout(() => {
+            spawnSpeedBoost();
+            scheduleSpeedBoost();
+        }, delay);
+    }
+    
+    setTimeout(() => {
+        scheduleSpeedBoost();
+    }, 10000);
 }
 
 // Leaderboard Functions
@@ -810,4 +886,157 @@ function updateTierBackground() {
     bgStyle.innerHTML = `body::before { background-image: url('${imageUrl}') !important; }`;
     
     console.log('Background updated:', tierName, imageUrl);
+}
+
+// Particle explosion effect
+function spawnParticles(x, y) {
+    const colors = ['#FFD700', '#FF6347', '#90EE90', '#FF69B4', '#00CED1', '#FFA500'];
+    const particleCount = comboCount > 10 ? 15 : 5;
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = x + 'px';
+        particle.style.top = y + 'px';
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        
+        const angle = (Math.PI * 2 * i) / particleCount;
+        const velocity = 50 + Math.random() * 100;
+        const vx = Math.cos(angle) * velocity;
+        const vy = Math.sin(angle) * velocity;
+        
+        particle.style.setProperty('--vx', vx + 'px');
+        particle.style.setProperty('--vy', vy + 'px');
+        
+        document.body.appendChild(particle);
+        
+        setTimeout(() => particle.remove(), 1000);
+    }
+}
+
+// Combo display
+function showCombo(count) {
+    let comboDisplay = document.getElementById('combo-display');
+    if (!comboDisplay) {
+        comboDisplay = document.createElement('div');
+        comboDisplay.id = 'combo-display';
+        comboDisplay.className = 'combo-display';
+        document.body.appendChild(comboDisplay);
+    }
+    
+    comboDisplay.textContent = `${count}x COMBO!`;
+    comboDisplay.classList.add('show');
+    
+    setTimeout(() => {
+        comboDisplay.classList.remove('show');
+    }, 1000);
+}
+
+// Random events system
+function triggerRandomEvent() {
+    if (!gameStarted) return;
+    
+    const events = [
+        {
+            name: 'DOUBLE TROUBLE',
+            effect: () => {
+                const allMultipliers = document.querySelectorAll('.multiplier');
+                allMultipliers.forEach(m => {
+                    const currentValue = parseInt(m.textContent);
+                    m.textContent = currentValue * 2 + 'x';
+                });
+                currentMultiplier *= 2;
+                showRandomEvent('DOUBLE TROUBLE! All multipliers doubled!');
+            }
+        },
+        {
+            name: 'BURGER RAIN',
+            effect: () => {
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => spawnMultiplier(), i * 500);
+                }
+                showRandomEvent('BURGER RAIN! Multipliers everywhere!');
+            }
+        },
+        {
+            name: 'SPEED DEMON',
+            effect: () => {
+                spawnSpeedBoost();
+                showRandomEvent('SPEED DEMON! Speed boost appeared!');
+            }
+        },
+        {
+            name: 'CHAOS MODE',
+            effect: () => {
+                chaosMode = true;
+                document.body.classList.add('chaos-mode');
+                showRandomEvent('CHAOS MODE ACTIVATED! 🔥');
+                setTimeout(() => {
+                    chaosMode = false;
+                    document.body.classList.remove('chaos-mode');
+                }, 10000);
+            }
+        },
+        {
+            name: 'MEGA BURGER',
+            effect: () => {
+                burgersEaten += 10;
+                updateBurgerTier();
+                updateBurgerSize();
+                showRandomEvent('MEGA BURGER! +10 burgers instantly!');
+                playCelebrationSound();
+            }
+        }
+    ];
+    
+    const event = events[Math.floor(Math.random() * events.length)];
+    event.effect();
+}
+
+function showRandomEvent(message) {
+    let eventDisplay = document.getElementById('random-event');
+    if (!eventDisplay) {
+        eventDisplay = document.createElement('div');
+        eventDisplay.id = 'random-event';
+        eventDisplay.className = 'random-event';
+        document.body.appendChild(eventDisplay);
+    }
+    
+    eventDisplay.textContent = message;
+    eventDisplay.style.display = 'block';
+    
+    setTimeout(() => {
+        eventDisplay.style.display = 'none';
+    }, 3000);
+}
+
+// Speed boost powerup
+function spawnSpeedBoost() {
+    const container = document.querySelector('.burger-container');
+    const speedBoost = document.createElement('div');
+    speedBoost.className = 'speed-boost';
+    speedBoost.textContent = '⚡ SPEED BOOST ⚡';
+    speedBoost.style.left = Math.random() * (window.innerWidth - 200) + 'px';
+    speedBoost.style.top = Math.random() * (window.innerHeight - 400) + 200 + 'px';
+    
+    speedBoost.addEventListener('click', () => {
+        speedBoostActive = true;
+        speedBoost.remove();
+        playPowerupSound();
+        showRandomEvent('⚡ SPEED BOOST ACTIVE! 2x clicks for 15 seconds! ⚡');
+        
+        setTimeout(() => {
+            speedBoostActive = false;
+            showRandomEvent('Speed boost expired');
+        }, 15000);
+    });
+    
+    document.body.appendChild(speedBoost);
+    
+    // Auto-remove after 10 seconds if not clicked
+    setTimeout(() => {
+        if (speedBoost.parentElement) {
+            speedBoost.remove();
+        }
+    }, 10000);
 }
