@@ -255,40 +255,34 @@ function updateBurgerSize() {
     burger.style.transform = `scale(${burgerScale})`;
     document.querySelector('.burger-container').style.transform = `scale(${currentZoom})`;
     
+    console.log('Burger scale:', burgerScale, 'Zoom:', currentZoom);
+    
     // Update AI background based on tier
     updateTierBackground();
     
-    // Update background based on milestones
+    // Update background stage tracking
     const body = document.body;
     
     if (burgersEaten >= 100) {
         backgroundStage = 7;
-        body.style.background = 'radial-gradient(circle, #000033 0%, #000000 100%)';
-        body.style.backgroundSize = 'cover';
         document.querySelector('.container').style.background = 'rgba(0,0,0,0.3)';
     } else if (burgersEaten >= 75) {
         backgroundStage = 6;
-        body.style.background = 'linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%)';
         document.querySelector('.container').style.background = 'rgba(0,0,0,0.4)';
     } else if (burgersEaten >= 50) {
         backgroundStage = 5;
-        body.style.background = 'linear-gradient(to bottom, #87CEEB 0%, #4682B4 50%, #2F4F4F 100%)';
         document.querySelector('.container').style.background = 'rgba(255,255,255,0.1)';
     } else if (burgersEaten >= 30) {
         backgroundStage = 4;
-        body.style.background = 'linear-gradient(to bottom, #654321 0%, #8B4513 50%, #A0522D 100%)';
         document.querySelector('.container').style.background = 'rgba(139,69,19,0.3)';
     } else if (burgersEaten >= 15) {
         backgroundStage = 3;
-        body.style.background = 'linear-gradient(135deg, #8B4513 0%, #D2691E 50%, #CD853F 100%)';
         document.querySelector('.container').style.background = 'rgba(139,69,19,0.2)';
     } else if (burgersEaten >= 5) {
         backgroundStage = 2;
-        body.style.background = 'linear-gradient(135deg, #8B0000 0%, #DC143C 50%, #FF6347 100%)';
         document.querySelector('.container').style.background = 'rgba(139,0,0,0.2)';
     } else if (burgersEaten >= 1) {
         backgroundStage = 1;
-        body.style.background = 'linear-gradient(135deg, #654321 0%, #8B4513 100%)';
         document.querySelector('.container').style.background = 'rgba(101,67,33,0.3)';
     }
     
@@ -803,17 +797,17 @@ function updateTierBackground() {
         imagePrompt = 'burger restaurant diner kitchen food';
     }
     
-    // Use Unsplash API for free high-quality images
+    // Use Unsplash API for free high-quality images with cache busting
     const imageUrl = `https://source.unsplash.com/1920x1080/?${encodeURIComponent(imagePrompt)}`;
     
-    document.body.style.setProperty('--bg-image', `url('${imageUrl}')`);
-    document.body.style.backgroundImage = `var(--bg-image)`;
-    document.body.style.backgroundSize = 'cover';
-    document.body.style.backgroundPosition = 'center';
-    document.body.style.backgroundAttachment = 'fixed';
+    // Update or create dynamic style element for background
+    let bgStyle = document.getElementById('dynamic-bg-style');
+    if (!bgStyle) {
+        bgStyle = document.createElement('style');
+        bgStyle.id = 'dynamic-bg-style';
+        document.head.appendChild(bgStyle);
+    }
+    bgStyle.innerHTML = `body::before { background-image: url('${imageUrl}') !important; }`;
     
-    // Update body::before element for backdrop
-    const style = document.createElement('style');
-    style.innerHTML = `body::before { background-image: url('${imageUrl}'); }`;
-    document.head.appendChild(style);
+    console.log('Background updated:', tierName, imageUrl);
 }
