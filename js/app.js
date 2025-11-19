@@ -1181,9 +1181,25 @@ function spawnFlyingMultiplier() {
         clicked = true;
         e.stopPropagation();
         
-        // Apply multiplier
-        currentMultiplier *= selectedMultiplier.value;
-        updateMultiplierDisplay();
+        // Visual feedback
+        flyingMult.style.transform = 'scale(2) rotate(360deg)';
+        flyingMult.style.opacity = '0';
+        
+        playPowerupSound();
+        showRandomEvent(`🚀 ${selectedMultiplier.value}x FLYING MULTIPLIER CAUGHT! 🚀`);
+        
+        // Add to active multipliers using the existing activation function
+        activateMultiplier(selectedMultiplier.value);
+        
+        setTimeout(() => flyingMult.remove(), 300);
+    });
+    
+    // Also handle touch events for mobile
+    flyingMult.addEventListener('touchend', (e) => {
+        if (clicked) return;
+        clicked = true;
+        e.preventDefault();
+        e.stopPropagation();
         
         // Visual feedback
         flyingMult.style.transform = 'scale(2) rotate(360deg)';
@@ -1192,9 +1208,8 @@ function spawnFlyingMultiplier() {
         playPowerupSound();
         showRandomEvent(`🚀 ${selectedMultiplier.value}x FLYING MULTIPLIER CAUGHT! 🚀`);
         
-        // Add to active multipliers with 30 second duration
-        const duration = 30000;
-        addMultiplier(selectedMultiplier.value, duration);
+        // Add to active multipliers using the existing activation function
+        activateMultiplier(selectedMultiplier.value);
         
         setTimeout(() => flyingMult.remove(), 300);
     });
