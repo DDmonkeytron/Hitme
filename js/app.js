@@ -252,16 +252,31 @@ function updateBurgerTier() {
 
 // Update burger size and background based on progress
 function updateBurgerSize() {
-    // Scale increases with each burger eaten
-    burgerScale = 1 + (burgersEaten * 0.15);
+    // Scale increases with each burger eaten but caps at reasonable size
+    // Every 10 burgers = +50% size, but we zoom out to compensate
+    burgerScale = 1 + (burgersEaten * 0.05);
     
-    // Calculate zoom out based on burger scale (camera pulls back as burger grows)
-    currentZoom = Math.max(0.3, 1 / (burgerScale * 0.5));
+    // Calculate zoom out - the bigger the burger, the more we zoom out
+    // This creates periods where burger fills screen, then zooms out
+    let zoomLevel;
+    if (burgersEaten < 10) {
+        zoomLevel = 1; // Normal size for first 10
+    } else if (burgersEaten < 25) {
+        zoomLevel = 0.8; // Slight zoom out
+    } else if (burgersEaten < 50) {
+        zoomLevel = 0.6; // Medium zoom
+    } else if (burgersEaten < 100) {
+        zoomLevel = 0.4; // Heavy zoom
+    } else {
+        zoomLevel = 0.25; // Extreme zoom for cosmic burgers
+    }
+    
+    currentZoom = zoomLevel;
     
     burger.style.transform = `scale(${burgerScale})`;
     document.querySelector('.burger-container').style.transform = `scale(${currentZoom})`;
     
-    console.log('Burger scale:', burgerScale, 'Zoom:', currentZoom);
+    console.log('Burger scale:', burgerScale, 'Zoom:', currentZoom, 'Burgers:', burgersEaten);
     
     // Update AI background based on tier
     updateTierBackground();
@@ -653,6 +668,9 @@ window.addEventListener('DOMContentLoaded', () => {
 function startGame() {
     gameStarted = true;
     
+    // Load initial background
+    updateTierBackground();
+    
     // Set up event listeners
     const burger = document.getElementById('burger');
     burger.addEventListener('click', takeBite);
@@ -873,8 +891,24 @@ function updateTierBackground() {
         imagePrompt = 'burger restaurant diner kitchen food';
     }
     
-    // Use Unsplash API for free high-quality images with cache busting
-    const imageUrl = `https://source.unsplash.com/1920x1080/?${encodeURIComponent(imagePrompt)}`;
+    // Use Picsum Photos API (more reliable) with different seeds based on tier
+    // This ensures we get different images for different tiers
+    const imageUrl = `https://picsum.photos/1920/1080?random=${burgerTier}`;
+    
+    // Alternative: Use placeholder images with CSS gradients based on tier
+    const colors = {
+        cosmic: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        galactic: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        universal: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        space: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+        default: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
+    };
+    
+    let gradientBg = colors.default;
+    if (tierName.includes('cosmic')) gradientBg = colors.cosmic;
+    else if (tierName.includes('galactic')) gradientBg = colors.galactic;
+    else if (tierName.includes('universal')) gradientBg = colors.universal;
+    else if (burgerTier >= 10) gradientBg = colors.space;
     
     // Update or create dynamic style element for background
     let bgStyle = document.getElementById('dynamic-bg-style');
@@ -883,9 +917,19 @@ function updateTierBackground() {
         bgStyle.id = 'dynamic-bg-style';
         document.head.appendChild(bgStyle);
     }
-    bgStyle.innerHTML = `body::before { background-image: url('${imageUrl}') !important; }`;
     
-    console.log('Background updated:', tierName, imageUrl);
+    // Use gradient as fallback, try to load image
+    bgStyle.innerHTML = `
+        body::before { 
+            background: ${gradientBg} !important;
+            background-image: url('${imageUrl}') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-blend-mode: overlay !important;
+        }
+    `;
+    
+    console.log('Background updated:', tierName, 'Tier:', burgerTier, 'URL:', imageUrl);
 }
 
 // Particle explosion effect
