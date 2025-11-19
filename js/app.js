@@ -18,6 +18,7 @@ let backgroundStage = 0;
 let burgerTier = 0;
 let playerName = '';
 let gameStarted = false;
+let currentZoom = 1;
 
 // Burger tier names (100 levels of progression)
 const burgerTiers = [
@@ -247,7 +248,15 @@ function updateBurgerTier() {
 function updateBurgerSize() {
     // Scale increases with each burger eaten
     burgerScale = 1 + (burgersEaten * 0.15);
+    
+    // Calculate zoom out based on burger scale (camera pulls back as burger grows)
+    currentZoom = Math.max(0.3, 1 / (burgerScale * 0.5));
+    
     burger.style.transform = `scale(${burgerScale})`;
+    document.querySelector('.burger-container').style.transform = `scale(${currentZoom})`;
+    
+    // Update AI background based on tier
+    updateTierBackground();
     
     // Update background based on milestones
     const body = document.body;
@@ -738,4 +747,73 @@ async function loadLeaderboard() {
         console.error('Failed to load leaderboard:', error);
         leaderboardList.innerHTML = '<p>Failed to load leaderboard. Please try again.</p>';
     }
+}
+
+// Background Image Generation
+function updateTierBackground() {
+    const tierData = burgerTiers[burgerTier];
+    const tierName = tierData.name.toLowerCase();
+    
+    // Generate AI image URL based on tier
+    let imagePrompt = '';
+    
+    if (tierName.includes('cosmic')) {
+        imagePrompt = 'cosmic nebula space stars purple pink galaxy';
+    } else if (tierName.includes('galactic')) {
+        imagePrompt = 'spiral galaxy stars cosmic deep space blue purple';
+    } else if (tierName.includes('universal')) {
+        imagePrompt = 'universe big bang cosmic explosion stars galaxies';
+    } else if (tierName.includes('celestial')) {
+        imagePrompt = 'celestial heavens clouds divine light golden rays';
+    } else if (tierName.includes('astral')) {
+        imagePrompt = 'astral plane mystical cosmic energy stars';
+    } else if (tierName.includes('quantum')) {
+        imagePrompt = 'quantum particles energy waves neon abstract';
+    } else if (tierName.includes('ethereal')) {
+        imagePrompt = 'ethereal mist glowing particles soft light';
+    } else if (tierName.includes('dimensional')) {
+        imagePrompt = 'multidimensional portal cosmic rifts reality warping';
+    } else if (tierName.includes('infinite')) {
+        imagePrompt = 'infinite space eternal cosmos endless void stars';
+    } else if (tierName.includes('transcendent')) {
+        imagePrompt = 'transcendent divine cosmic light ascension golden';
+    } else if (tierName.includes('omniversal')) {
+        imagePrompt = 'omniverse multiverse infinite realities cosmic';
+    } else if (tierName.includes('primordial')) {
+        imagePrompt = 'primordial chaos ancient cosmic beginning creation';
+    } else if (tierName.includes('eldritch')) {
+        imagePrompt = 'eldritch cosmic horror dark space purple tentacles';
+    } else if (tierName.includes('void')) {
+        imagePrompt = 'void black hole event horizon cosmic darkness';
+    } else if (tierName.includes('singularity')) {
+        imagePrompt = 'singularity black hole gravity cosmic event';
+    } else if (tierName.includes('apex')) {
+        imagePrompt = 'apex cosmic pinnacle ultimate power golden energy';
+    } else if (tierName.includes('godlike')) {
+        imagePrompt = 'godlike divine cosmic power celestial throne';
+    } else if (tierName.includes('the burger')) {
+        imagePrompt = 'ultimate cosmic being god entity reality itself golden divine';
+    } else if (burgerTier >= 50) {
+        imagePrompt = 'deep space nebula stars cosmic wonder';
+    } else if (burgerTier >= 25) {
+        imagePrompt = 'outer space planets stars solar system';
+    } else if (burgerTier >= 10) {
+        imagePrompt = 'space earth orbit stars atmosphere';
+    } else {
+        imagePrompt = 'burger restaurant diner kitchen food';
+    }
+    
+    // Use Unsplash API for free high-quality images
+    const imageUrl = `https://source.unsplash.com/1920x1080/?${encodeURIComponent(imagePrompt)}`;
+    
+    document.body.style.setProperty('--bg-image', `url('${imageUrl}')`);
+    document.body.style.backgroundImage = `var(--bg-image)`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundAttachment = 'fixed';
+    
+    // Update body::before element for backdrop
+    const style = document.createElement('style');
+    style.innerHTML = `body::before { background-image: url('${imageUrl}'); }`;
+    document.head.appendChild(style);
 }
