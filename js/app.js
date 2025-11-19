@@ -729,6 +729,19 @@ function startGame() {
     setTimeout(() => {
         scheduleSpeedBoost();
     }, 10000);
+    
+    // Flying multipliers every 15-30 seconds
+    function scheduleFlyingMultiplier() {
+        const delay = Math.random() * 15000 + 15000; // 15-30 seconds
+        setTimeout(() => {
+            spawnFlyingMultiplier();
+            scheduleFlyingMultiplier();
+        }, delay);
+    }
+    
+    setTimeout(() => {
+        scheduleFlyingMultiplier();
+    }, 8000); // First one after 8 seconds
 }
 
 // Leaderboard Functions
@@ -1083,4 +1096,104 @@ function spawnSpeedBoost() {
             speedBoost.remove();
         }
     }, 10000);
+}
+
+// Flying Multipliers (8x, 16x, 24x)
+function spawnFlyingMultiplier() {
+    const multipliers = [
+        { value: 8, class: 'x8', chance: 0.5 },
+        { value: 16, class: 'x16', chance: 0.35 },
+        { value: 24, class: 'x24', chance: 0.15 }
+    ];
+    
+    // Choose multiplier based on weighted chance
+    const rand = Math.random();
+    let selectedMultiplier;
+    let cumulative = 0;
+    
+    for (const mult of multipliers) {
+        cumulative += mult.chance;
+        if (rand <= cumulative) {
+            selectedMultiplier = mult;
+            break;
+        }
+    }
+    
+    if (!selectedMultiplier) selectedMultiplier = multipliers[0];
+    
+    const flyingMult = document.createElement('div');
+    flyingMult.className = `flying-multiplier ${selectedMultiplier.class}`;
+    flyingMult.textContent = `${selectedMultiplier.value}x`;
+    
+    // Random starting position (left, right, top, or bottom edge)
+    const edge = Math.floor(Math.random() * 4); // 0=left, 1=right, 2=top, 3=bottom
+    let startX, startY, endX, endY;
+    
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    
+    if (edge === 0) { // Start from left
+        startX = -100;
+        startY = Math.random() * (screenHeight - 200) + 100;
+        endX = screenWidth + 100;
+        endY = Math.random() * (screenHeight - 200) + 100;
+    } else if (edge === 1) { // Start from right
+        startX = screenWidth + 100;
+        startY = Math.random() * (screenHeight - 200) + 100;
+        endX = -100;
+        endY = Math.random() * (screenHeight - 200) + 100;
+    } else if (edge === 2) { // Start from top
+        startX = Math.random() * (screenWidth - 200) + 100;
+        startY = -100;
+        endX = Math.random() * (screenWidth - 200) + 100;
+        endY = screenHeight + 100;
+    } else { // Start from bottom
+        startX = Math.random() * (screenWidth - 200) + 100;
+        startY = screenHeight + 100;
+        endX = Math.random() * (screenWidth - 200) + 100;
+        endY = -100;
+    }
+    
+    flyingMult.style.setProperty('--start-x', startX + 'px');
+    flyingMult.style.setProperty('--start-y', startY + 'px');
+    flyingMult.style.setProperty('--end-x', endX + 'px');
+    flyingMult.style.setProperty('--end-y', endY + 'px');
+    
+    flyingMult.style.left = startX + 'px';
+    flyingMult.style.top = startY + 'px';
+    
+    let clicked = false;
+    
+    flyingMult.addEventListener('click', (e) => {
+        if (clicked) return;
+        clicked = true;
+        e.stopPropagation();
+        
+        // Apply multiplier
+        currentMultiplier *= selectedMultiplier.value;
+        updateMultiplierDisplay();
+        
+        // Visual feedback
+        flyingMult.style.transform = 'scale(2) rotate(360deg)';
+        flyingMult.style.opacity = '0';
+        
+        playPowerupSound();
+        showRandomEvent(`🚀 ${selectedMultiplier.value}x FLYING MULTIPLIER CAUGHT! 🚀`);
+        
+        // Add to active multipliers with 30 second duration
+        const duration = 30000;
+        addMultiplier(selectedMultiplier.value, duration);
+        
+        setTimeout(() => flyingMult.remove(), 300);
+    });
+    
+    document.body.appendChild(flyingMult);
+    
+    // Remove after animation completes (4 seconds)
+    setTimeout(() => {
+        if (flyingMult.parentElement && !clicked) {
+            flyingMult.style.opacity = '0';
+            setTimeout(() => flyingMult.remove(), 300);
+        }
+    }, 4000);
 }
