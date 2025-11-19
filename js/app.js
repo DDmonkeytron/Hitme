@@ -1,5 +1,10 @@
 // Burger Clicker Game
 
+// JSONBin Configuration
+const JSONBIN_API_KEY = '$2a$10$LwIkUXYuI8s1O/c2QteHV.eU7YkjUCfB3ELTQcCR38S2h6aG5j/1q';
+const JSONBIN_BIN_ID = '691d92caae596e708f6297f1';
+const JSONBIN_API_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
 // Game state
 let totalBites = 0;
 let burgersEaten = 0;
@@ -11,6 +16,8 @@ let multiplierSpawnInterval;
 let burgerScale = 1;
 let backgroundStage = 0;
 let burgerTier = 0;
+let playerName = '';
+let gameStarted = false;
 
 // Burger tier names (100 levels of progression)
 const burgerTiers = [
@@ -509,6 +516,11 @@ function takeBite(event) {
     if (currentBurgerBites >= requiredBites) {
         burgersEaten++;
         eatBurger();
+        
+        // Save to leaderboard on burger completion
+        if (gameStarted && burgersEaten % 10 === 0) {
+            saveToLeaderboard();
+        }
     } else {
         // Scale down burger slightly with each bite
         const biteProgress = currentBurgerBites / requiredBites;
@@ -535,7 +547,61 @@ document.addEventListener('keydown', (event) => {
 window.addEventListener('DOMContentLoaded', () => {
     console.log('🍔 Burger Clicker initialized! Click the burger to eat!');
     
+    // Show name entry modal
+    const nameModal = document.getElementById('nameModal');
+    const playerNameInput = document.getElementById('playerNameInput');
+    const startGameBtn = document.getElementById('startGameBtn');
+    
+    startGameBtn.addEventListener('click', () => {
+        const name = playerNameInput.value.trim();
+        if (name.length > 0) {
+            playerName = name;
+            nameModal.style.display = 'none';
+            startGame();
+        } else {
+            alert('Please enter your name!');
+        }
+    });
+    
+    // Allow Enter key to submit
+    playerNameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            startGameBtn.click();
+        }
+    });
+    
+    // Leaderboard toggle
+    const leaderboardBtn = document.getElementById('leaderboardBtn');
+    const leaderboardModal = document.getElementById('leaderboardModal');
+    const closeLeaderboard = document.getElementById('closeLeaderboard');
+    const refreshLeaderboard = document.getElementById('refreshLeaderboard');
+    
+    leaderboardBtn.addEventListener('click', () => {
+        leaderboardModal.style.display = 'flex';
+        loadLeaderboard();
+    });
+    
+    closeLeaderboard.addEventListener('click', () => {
+        leaderboardModal.style.display = 'none';
+    });
+    
+    refreshLeaderboard.addEventListener('click', () => {
+        loadLeaderboard();
+    });
+    
+    // Close modal when clicking outside
+    leaderboardModal.addEventListener('click', (e) => {
+        if (e.target === leaderboardModal) {
+            leaderboardModal.style.display = 'none';
+        }
+    });
+});
+
+function startGame() {
+    gameStarted = true;
+    
     // Set up event listeners
+    const burger = document.getElementById('burger');
     burger.addEventListener('click', takeBite);
     burger.addEventListener('touchend', (event) => {
         event.preventDefault();
@@ -544,6 +610,13 @@ window.addEventListener('DOMContentLoaded', () => {
     });
     
     updateStats();
+    
+    // Auto-save to leaderboard every 30 seconds
+    setInterval(() => {
+        if (gameStarted) {
+            saveToLeaderboard();
+        }
+    }, 30000);
     
     // Start spawning multipliers every 10-20 seconds
     function scheduleNextMultiplier() {
@@ -559,4 +632,110 @@ window.addEventListener('DOMContentLoaded', () => {
         spawnMultiplier();
         scheduleNextMultiplier();
     }, 5000);
-});
+}
+
+// Leaderboard Functions
+async function saveToLeaderboard() {
+    if (!playerName || !gameStarted) return;
+    
+    try {
+        // Get current leaderboard
+        const response = await fetch(JSONBIN_API_URL + '/latest', {
+            headers: {
+                'X-Master-Key': JSONBIN_API_KEY
+            }
+        });
+        
+        const data = await response.json();
+        let leaderboard = data.record.leaderboard || [];
+        
+        // Find existing entry or create new one
+        const existingIndex = leaderboard.findIndex(entry => entry.name === playerName);
+        const tierData = burgerTiers[burgerTier];
+        
+        const playerData = {
+            name: playerName,
+            burgers: burgersEaten,
+            bites: totalBites,
+            tier: burgerTier,
+            tierName: tierData.name,
+            timestamp: Date.now()
+        };
+        
+        if (existingIndex >= 0) {
+            // Update if better score
+            if (burgersEaten > leaderboard[existingIndex].burgers) {
+                leaderboard[existingIndex] = playerData;
+            }
+        } else {
+            leaderboard.push(playerData);
+        }
+        
+        // Sort by burgers eaten
+        leaderboard.sort((a, b) => b.burgers - a.burgers);
+        
+        // Keep top 100
+        leaderboard = leaderboard.slice(0, 100);
+        
+        // Update JSONBin
+        await fetch(JSONBIN_API_URL, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Master-Key': JSONBIN_API_KEY
+            },
+            body: JSON.stringify({ leaderboard })
+        });
+        
+        console.log('Saved to leaderboard!');
+    } catch (error) {
+        console.error('Failed to save to leaderboard:', error);
+    }
+}
+
+async function loadLeaderboard() {
+    const leaderboardList = document.getElementById('leaderboardList');
+    leaderboardList.innerHTML = '<p>Loading...</p>';
+    
+    try {
+        const response = await fetch(JSONBIN_API_URL + '/latest', {
+            headers: {
+                'X-Master-Key': JSONBIN_API_KEY
+            }
+        });
+        
+        const data = await response.json();
+        const leaderboard = data.record.leaderboard || [];
+        
+        if (leaderboard.length === 0) {
+            leaderboardList.innerHTML = '<p>No entries yet. Be the first!</p>';
+            return;
+        }
+        
+        leaderboardList.innerHTML = '';
+        
+        leaderboard.forEach((entry, index) => {
+            const div = document.createElement('div');
+            div.className = 'leaderboard-entry';
+            if (index === 0) div.classList.add('top1');
+            if (index === 1) div.classList.add('top2');
+            if (index === 2) div.classList.add('top3');
+            
+            const rank = index < 3 ? ['🥇', '🥈', '🥉'][index] : `#${index + 1}`;
+            
+            div.innerHTML = `
+                <span class="leaderboard-rank">${rank}</span>
+                <span class="leaderboard-name">${entry.name}</span>
+                <span class="leaderboard-stats">
+                    <div>${entry.burgers.toLocaleString()} 🍔</div>
+                    <div class="leaderboard-tier">${entry.tierName}</div>
+                </span>
+            `;
+            
+            leaderboardList.appendChild(div);
+        });
+    } catch (error) {
+        console.error('Failed to load leaderboard:', error);
+        leaderboardList.innerHTML = '<p>Failed to load leaderboard. Please try again.</p>';
+    }
+}

@@ -8,10 +8,35 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <!-- Name Entry Modal -->
+    <div id="nameModal" class="modal">
+        <div class="modal-content">
+            <h2>🍔 Welcome to Burger Clicker! 🍔</h2>
+            <p>Enter your name to join the global leaderboard:</p>
+            <input type="text" id="playerNameInput" placeholder="Your Name" maxlength="20">
+            <button id="startGameBtn" class="btn">Start Playing!</button>
+        </div>
+    </div>
+
+    <!-- Leaderboard Button -->
+    <button id="leaderboardBtn" class="leaderboard-toggle">🏆 Leaderboard</button>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboardModal" class="modal" style="display: none;">
+        <div class="modal-content leaderboard-content">
+            <span class="close-btn" id="closeLeaderboard">&times;</span>
+            <h2>🏆 Global Leaderboard 🏆</h2>
+            <div id="leaderboardList" class="leaderboard-list">
+                <p>Loading...</p>
+            </div>
+            <button id="refreshLeaderboard" class="btn">Refresh</button>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <h1>🍔 Regular Burger Clicker 🍔</h1>
-            <p class=\"tagline\">Click to take bites!</p>
+            <p class="tagline">Click to take bites!</p>
         </header>
 
         <main>
