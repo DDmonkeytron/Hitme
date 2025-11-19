@@ -558,6 +558,14 @@ function takeBite(event) {
         }, 500);
     }
     
+    // Rainbow chaos mode on massive combos
+    if (comboCount > 15) {
+        burger.classList.add('chaos-mode');
+        setTimeout(() => {
+            burger.classList.remove('chaos-mode');
+        }, 1000);
+    }
+    
     // Add bite animation
     burger.classList.add('bite');
     setTimeout(() => {
@@ -947,7 +955,11 @@ function updateTierBackground() {
 
 // Particle explosion effect
 function spawnParticles(x, y) {
-    const colors = ['#FFD700', '#FF6347', '#90EE90', '#FF69B4', '#00CED1', '#FFA500'];
+    const colors = [
+        '#FFD700', '#FF6347', '#90EE90', '#FF69B4', '#00CED1', '#FFA500',
+        '#FF00FF', '#00FF00', '#0000FF', '#FFFF00', '#FF1493', '#7FFF00',
+        '#FF4500', '#DA70D6', '#00FFFF', '#FF00AA', '#ADFF2F', '#FF6600'
+    ];
     const particleCount = comboCount > 10 ? 15 : 5;
     
     for (let i = 0; i < particleCount; i++) {

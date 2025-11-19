@@ -296,7 +296,7 @@ main {
 
 .celebration.show {
     opacity: 1;
-    animation: celebrate 1s ease-out;
+    animation: celebrate 1s ease-out, rainbow 1s linear infinite, neonGlow 1s ease-in-out infinite;
 }
 
 /* Multiplier Powerups */
@@ -567,6 +567,49 @@ footer {
     100% { filter: hue-rotate(360deg); }
 }
 
+@keyframes flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes colorPulse {
+    0% { 
+        box-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000;
+        border-color: #ff0000;
+    }
+    25% { 
+        box-shadow: 0 0 20px #00ff00, 0 0 40px #00ff00;
+        border-color: #00ff00;
+    }
+    50% { 
+        box-shadow: 0 0 20px #0000ff, 0 0 40px #0000ff;
+        border-color: #0000ff;
+    }
+    75% { 
+        box-shadow: 0 0 20px #ffff00, 0 0 40px #ffff00;
+        border-color: #ffff00;
+    }
+    100% { 
+        box-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000;
+        border-color: #ff0000;
+    }
+}
+
+@keyframes neonGlow {
+    0%, 100% {
+        text-shadow: 0 0 10px #ff00de, 0 0 20px #ff00de, 0 0 30px #ff00de;
+    }
+    25% {
+        text-shadow: 0 0 10px #00fff9, 0 0 20px #00fff9, 0 0 30px #00fff9;
+    }
+    50% {
+        text-shadow: 0 0 10px #39ff14, 0 0 20px #39ff14, 0 0 30px #39ff14;
+    }
+    75% {
+        text-shadow: 0 0 10px #ffff00, 0 0 20px #ffff00, 0 0 30px #ffff00;
+    }
+}
+
 .screen-shake {
     animation: shake 0.5s ease-in-out;
 }
@@ -577,8 +620,9 @@ footer {
     height: 20px;
     border-radius: 50%;
     pointer-events: none;
-    animation: explode 1s ease-out forwards;
+    animation: explode 1s ease-out forwards, rainbow 0.5s linear infinite;
     z-index: 9999;
+    box-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
 }
 
 .chaos-mode {
@@ -598,6 +642,7 @@ footer {
     z-index: 10000;
     opacity: 0;
     transition: opacity 0.3s ease;
+    animation: neonGlow 1s ease-in-out infinite;
 }
 
 .combo-display.show {
@@ -613,10 +658,11 @@ footer {
     border-radius: 15px;
     font-weight: bold;
     cursor: pointer;
-    animation: float 3s ease-in-out infinite, spawn 0.5s ease-out;
+    animation: float 3s ease-in-out infinite, spawn 0.5s ease-out, colorPulse 1.5s ease-in-out infinite;
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
     transition: transform 0.2s ease;
     z-index: 100;
+    border: 3px solid #00ff00;
 }
 
 .speed-boost:hover {
@@ -646,6 +692,7 @@ footer {
     background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
     color: #fff;
     border: 3px solid #ff0000;
+    animation: flyAcross 4s linear forwards, flash 0.5s ease-in-out infinite;
 }
 
 .flying-multiplier.x16 {
@@ -653,14 +700,16 @@ footer {
     color: #000;
     border: 3px solid #ff8c00;
     box-shadow: 0 0 30px #ffd93d;
+    animation: flyAcross 4s linear forwards, flash 0.3s ease-in-out infinite;
 }
 
 .flying-multiplier.x24 {
-    background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+    background: linear-gradient(135deg, #a29bfe, #6c5ce7, #ff00ff, #00ffff);
+    background-size: 200% 200%;
     color: #fff;
     border: 3px solid #5f27cd;
-    box-shadow: 0 0 40px #a29bfe;
-    animation: flyAcross 4s linear forwards, pulse 0.5s ease-in-out infinite;
+    box-shadow: 0 0 40px #a29bfe, 0 0 60px #ff00ff;
+    animation: flyAcross 4s linear forwards, pulse 0.5s ease-in-out infinite, rainbow 2s linear infinite, flash 0.2s ease-in-out infinite;
 }
 
 @keyframes flyAcross {
@@ -688,8 +737,9 @@ footer {
     font-size: 1.2rem;
     font-weight: bold;
     z-index: 9999;
-    animation: fadeInUp 0.5s ease-out;
+    animation: fadeInUp 0.5s ease-out, colorPulse 1s ease-in-out infinite, neonGlow 1s ease-in-out infinite;
     box-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+    border: 2px solid #ff0000;
 }
 
 /* Modal Styles */
